@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "tsx src/lib/db/migrate.ts"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/lib/db/migrate.ts",
+    "db:clear": "tsx src/lib/db/clear.ts"
   },
   "dependencies": {
     "@types/pg": "^8.11.11",

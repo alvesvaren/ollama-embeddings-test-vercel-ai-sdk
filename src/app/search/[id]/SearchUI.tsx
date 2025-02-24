@@ -7,9 +7,10 @@ import type { search } from "../../actions";
 type SearchUIProps = {
   query?: string;
   results: Awaited<ReturnType<typeof search>>["results"];
+  searchType: "content" | "summary";
 };
 
-export default function SearchUI({ query, results }: SearchUIProps) {
+export default function SearchUI({ query, results, searchType }: SearchUIProps) {
   const [selectedPdf, setSelectedPdf] = useState<{ fileUUID: string; pageNumber: number } | null>(null);
 
   return (
@@ -27,6 +28,14 @@ export default function SearchUI({ query, results }: SearchUIProps) {
               <div>
                 <label className='block mb-2'>Search Query:</label>
                 <input type='text' name='query' defaultValue={query} className='w-full p-2 border rounded' placeholder='Enter your search query...' />
+              </div>
+
+              <div>
+                <label className='block mb-2'>Search Type:</label>
+                <select defaultValue={searchType} name='searchType' className='w-full p-2 border rounded'>
+                  <option value='content'>Search in Content</option>
+                  <option value='summary'>Search in Summary</option>
+                </select>
               </div>
 
               <button type='submit' className='px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400'>

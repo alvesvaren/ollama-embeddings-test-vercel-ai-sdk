@@ -16,11 +16,15 @@ export const documents = pgTable(
     chapter: integer().default(-1),
     section: integer().default(-1),
     type: text().default("unknown"),
-    embedding: vector({ dimensions: 1024 }),
+    contentEmbedding: vector({ dimensions: 1024 }),
+    summaryEmbedding: vector({ dimensions: 1024 }),
     createdAt: timestamp().defaultNow().notNull(),
     resourceId: uuid()
       .references(() => resources.uuid)
       .notNull(),
   },
-  table => [index("embeddingIndex").using("hnsw", table.embedding.op("vector_cosine_ops"))]
+  table => [
+    index("contentEmbeddingIndex").using("hnsw", table.contentEmbedding.op("vector_cosine_ops")),
+    index("summaryEmbeddingIndex").using("hnsw", table.summaryEmbedding.op("vector_cosine_ops"))
+  ]
 );

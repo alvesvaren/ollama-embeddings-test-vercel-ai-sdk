@@ -19,18 +19,19 @@ async function getEmbedding(text: string): Promise<number[]> {
     model: "bge-m3",
   });
 
-  return embedding;
+  return embedding ?? [];
 }
 
-export async function search(query: string, documentId: string) {
+export async function search(query: string, documentId: string, searchType: "content" | "summary" = "content") {
   if (!query) {
     throw new Error("No query provided");
   }
 
   const embedding = await getEmbedding(query);
 
-  // Calculate cosine similarity and find the most similar documents
-  const similarity = sql<number>`1 - (${cosineDistance(documents.embedding, embedding)})`;
+  // Calculate cosine similarity and find the most similar documents based on the selected embedding type
+  const embeddingField = searchType === "content" ? documents.contentEmbedding : documents.summaryEmbedding;
+  const similarity = sql<number>`1 - (${cosineDistance(embeddingField, embedding)})`;
 
   const results = await db
     .select({
@@ -106,7 +107,7 @@ export async function upload(formData: FormData) {
   const pages = await pdfToPages(buffer);
 
   for (const [index, page] of pages.entries()) {
-    console.log(`Summarizing page ${page.page} (${index + 1}/${pages.length})`);
+    console.log(`Processing page ${page.page} (${index + 1}/${pages.length})`);
     const pageSummary = await summarize(page.text).catch(e => {
       console.error("Error summarizing page", e);
       return null;
@@ -114,15 +115,18 @@ export async function upload(formData: FormData) {
 
     if (!pageSummary) continue;
 
-    const embedding = await getEmbedding(pageSummary.contentDescription);
+    // Generate embeddings for both content and summary
+    const contentEmbedding = await getEmbedding(page.text);
+    const summaryEmbedding = await getEmbedding(pageSummary.contentDescription);
 
-    if (embedding.length === 0) continue;
+    if (contentEmbedding.length === 0 || summaryEmbedding.length === 0) continue;
 
     await db.insert(documents).values({
       resourceId: resource.uuid,
       content: page.text,
       pageNumber: page.page,
-      embedding: embedding,
+      contentEmbedding: contentEmbedding,
+      summaryEmbedding: summaryEmbedding,
       summary: pageSummary.contentDescription,
       chapter: pageSummary.chapter,
       section: pageSummary.section,
