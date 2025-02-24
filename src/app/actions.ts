@@ -60,7 +60,7 @@ export async function upload(formData: FormData) {
       throw new Error("No file provided");
     }
 
-    fs.writeFile(`../public/uploads/${encodeURIComponent(file.name)}`, await file.bytes());
+    await fs.writeFile(`./public/uploads/${encodeURIComponent(file.name)}`, await file.bytes());
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const pages = await pdfToPages(buffer);
