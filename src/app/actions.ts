@@ -5,27 +5,25 @@ import { documents } from "@/lib/db/schema";
 import { cosineDistance, desc, eq, gt, sql } from "drizzle-orm";
 import { pdfToPages } from "pdf-ts";
 import fs from "fs/promises";
+import ollama from "ollama";
+import { z } from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 
 async function getEmbedding(text: string): Promise<number[]> {
-  const response = await fetch("http://localhost:11434/api/embeddings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "bge-m3",
-      prompt: text,
-    }),
+  const {
+    embeddings: [embedding],
+  } = await ollama.embed({
+    input: text,
+    model: "bge-m3",
   });
 
-  const data = await response.json();
-  return data.embedding;
+  return embedding;
 }
 
 export async function search(query: string) {
   try {
     if (!query) {
-      return { error: "No query provided" };
+      throw new Error("No query provided");
     }
 
     const embedding = await getEmbedding(query);
@@ -38,6 +36,7 @@ export async function search(query: string) {
         content: documents.content,
         filename: documents.filename,
         pageNumber: documents.pageNumber,
+        summary: documents.summary,
         similarity,
       })
       .from(documents)
@@ -48,8 +47,40 @@ export async function search(query: string) {
     return { results };
   } catch (error) {
     console.error("Error querying documents:", error);
-    return { error: "Error querying documents" };
+    throw error;
   }
+}
+
+async function summarize(text: string) {
+  const outputSchema = z.object({
+    summary: z
+      .string()
+      .describe(
+        "A short description of the current page. Keep it short and to the point, but make sure to include all important information. Example: 'Matrix multiplication is a way to multiply two matrices together. Dot product is a way to multiply two vectors together.'. Keep it in the same language as the current page."
+      ),
+    chapter: z.number().int().describe("The chapter number of the current page. Use -1 if unsure."),
+    section: z.number().int().describe("The section number of the current page. Use -1 if unsure."),
+    type: z
+      .enum(["unknown", "example", "explaination", "other", "none", "theory", "exercise", "summary"])
+      .describe("The type of the current page. Use 'unknown' if unsure. If there's multiple types, use the most relevant one."),
+  });
+
+  const response = await ollama.chat({
+    model: "phi4",
+    messages: [
+      {
+        role: "system",
+        content: "Based on the content, provide the requested data.",
+      },
+      {
+        role: "user",
+        content: `Current page: ${text}`,
+      },
+    ],
+    format: zodToJsonSchema(outputSchema),
+  });
+
+  return outputSchema.parse(JSON.parse(response.message.content));
 }
 
 export async function upload(formData: FormData) {
@@ -73,8 +104,17 @@ export async function upload(formData: FormData) {
       throw new Error("File already exists");
     }
 
-    for (const page of pages) {
-      const embedding = await getEmbedding(page.text);
+    for (const [index, page] of pages.entries()) {
+      console.log(`Summarizing page ${page.page} (${index + 1}/${pages.length})`);
+      const pageSummary = await summarize(page.text).catch(e => {
+        console.error("Error summarizing page", e);
+        return null;
+      });
+
+      if (!pageSummary) continue;
+
+      const embedding = await getEmbedding(pageSummary.summary);
+
       if (embedding.length === 0) continue;
 
       await db.insert(documents).values({
@@ -82,6 +122,10 @@ export async function upload(formData: FormData) {
         pageNumber: page.page,
         filename: file.name,
         embedding: embedding,
+        summary: pageSummary.summary,
+        chapter: pageSummary.chapter,
+        section: pageSummary.section,
+        type: pageSummary.type,
       });
     }
   } catch (error) {

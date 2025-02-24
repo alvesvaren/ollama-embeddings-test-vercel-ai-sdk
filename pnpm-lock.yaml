@@ -23,6 +23,9 @@ importers:
       next:
         specifier: 15.1.7
         version: 15.1.7(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      ollama:
+        specifier: ^0.5.13
+        version: 0.5.13
       pdf-parse:
         specifier: ^1.1.1
         version: 1.1.1
@@ -41,6 +44,12 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
+      zod-to-json-schema:
+        specifier: ^3.24.3
+        version: 3.24.3(zod@3.24.2)
     devDependencies:
       '@types/node':
         specifier: ^20
@@ -1930,6 +1939,9 @@ packages:
   obuf@1.1.2:
     resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
 
+  ollama@0.5.13:
+    resolution: {integrity: sha512-qK3eE2GjMYjCiTknEJfAHjbUzUqgVtf9qtzjxWrkwBZgBG7kOB6Z4+Ov4fbvDjmKKHv+rpuTsWFg4jZvVjNBtQ==}
+
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
@@ -2639,6 +2651,9 @@ packages:
         optional: true
       webpack-command:
         optional: true
+
+  whatwg-fetch@3.6.20:
+    resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -4484,6 +4499,10 @@ snapshots:
 
   obuf@1.1.2: {}
 
+  ollama@0.5.13:
+    dependencies:
+      whatwg-fetch: 3.6.20
+
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
@@ -5297,6 +5316,8 @@ snapshots:
       webpack-sources: 1.4.3
     transitivePeerDependencies:
       - supports-color
+
+  whatwg-fetch@3.6.20: {}
 
   which@2.0.2:
     dependencies:
