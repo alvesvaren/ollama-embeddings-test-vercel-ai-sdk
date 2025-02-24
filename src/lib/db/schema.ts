@@ -18,7 +18,9 @@ export const documents = pgTable(
     type: text().default("unknown"),
     embedding: vector({ dimensions: 1024 }),
     createdAt: timestamp().defaultNow().notNull(),
-    resourceId: uuid().references(() => resources.uuid).notNull(),
+    resourceId: uuid()
+      .references(() => resources.uuid)
+      .notNull(),
   },
   table => [index("embeddingIndex").using("hnsw", table.embedding.op("vector_cosine_ops"))]
 );
