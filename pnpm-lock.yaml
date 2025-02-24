@@ -26,6 +26,9 @@ importers:
       ollama:
         specifier: ^0.5.13
         version: 0.5.13
+      partial-json:
+        specifier: ^0.1.7
+        version: 0.1.7
       pdf-parse:
         specifier: ^1.1.1
         version: 1.1.1
@@ -1972,6 +1975,9 @@ packages:
   parse-asn1@5.1.7:
     resolution: {integrity: sha512-CTM5kuWR3sx9IFamcl5ErfPl6ea/N8IYwiJ+vpeB2g+1iknv7zBl5uPwbMbRVznRVbrNY6lGuDoE5b30grmbqg==}
     engines: {node: '>= 0.10'}
+
+  partial-json@0.1.7:
+    resolution: {integrity: sha512-Njv/59hHaokb/hRUjce3Hdv12wd60MtM9Z5Olmn+nehe0QDAsRtRbJPvJ0Z91TusF0SuZRIvnM+S4l6EIP8leA==}
 
   pascalcase@0.1.1:
     resolution: {integrity: sha512-XHXfu/yOQRy9vYOtUDVMN60OEJjW013GoObG1o+xwQTpB9eYJX/BjXMsdW13ZDPruFhYYn0AG22w0xgQMwl3Nw==}
@@ -4537,6 +4543,8 @@ snapshots:
       hash-base: 3.0.5
       pbkdf2: 3.1.2
       safe-buffer: 5.2.1
+
+  partial-json@0.1.7: {}
 
   pascalcase@0.1.1: {}
 
