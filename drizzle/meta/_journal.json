@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1740333572186,
+      "tag": "0000_fine_rocket_raccoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1740336685499,
+      "tag": "0001_tense_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740338267394,
+      "tag": "0002_eminent_ultimatum",
+      "breakpoints": true
+    }
+  ]
+}
